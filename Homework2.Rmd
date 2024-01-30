@@ -1,0 +1,132 @@
+---
+title: "Homework 2"
+author: "Tarun Manoharan"
+date: "2024-01-30"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r global_options, echo=FALSE}
+knitr::opts_chunk$set(fig.height=3, fig.width=4, warning=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=60))
+```
+
+***
+```{r, echo =  FALSE, message = FALSE}
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(kableExtra)
+```
+
+## Problem 1: Beauty, or not, in the classroom
+
+```{r, echo = FALSE}
+profs = read.csv("profs.csv")
+```
+
+### Part A.
+```{r echo = FALSE, fig.width = 10}
+ggplot(profs) + geom_histogram(aes(x = eval), col = 'black', fill = 'mediumpurple1', binwidth = 0.1) + labs(title = "Distribution of Course Evaluation Scores", x = "Course Evaluation Score", y = "Frequency") + theme_classic()
+```
+This histogram shows the distribution of course evaluation scores among all scores. The distribution of the graph peaks at 4 score, and the lowest being from 0 to around 2.1 with no professors being evaluated at that score. This shows that the majority of professors are being rated around a 4.0.
+
+### Part B.
+```{r echo = FALSE, fig.width = 10}
+ggplot(profs) + geom_boxplot(aes(x = eval), fill = 'lightskyblue1') + facet_wrap(~native) + theme_classic() + labs(title = "Distribution of Course Evaluation Split by Native Status", x = "Course Evaluation Score")
+```
+These box plots show the distribution of course evaluation scores split by whether or not the professor is a native English speaker or not. The data shows that the mean for native speakers is around 4 and non-native speakers is around 2.5. As well as native speakers go as low as 2.1 and as high as 5, whereas non-native speakers have much less variance. This data shows that students however on average prefer native speakers, but native speaker status does not guarantee a better score. 
+### Part C. 
+```{r echo = FALSE, fig.width = 10}
+ggplot(profs) + geom_histogram(aes(x = eval), col = 'black', binwidth = 0.1, fill = 'seagreen1') + theme_classic() + facet_wrap(~gender) + labs(title = "Distribution of Course Evaluation Score by Gender", x = "Course Evaluation Score", y = "Frequency") 
+```
+These histograms show the the distribution of course evaluation score split by gender. The data shows that male professors have a higher peak of over 20 on two separate scores, however the distributions for both genders follow the same pattern and peak at around 4.0. This data shows that more students have professors that are male, and the data for rating both male and female professors, are around the same showing no outstanding preference to one or the other. 
+
+### Part D.
+```{r echo = FALSE, fig.width = 10}
+ggplot(profs) + geom_point(aes(x = beauty, y = eval), fill = 'pink', shape = 21) + theme_classic() + labs(title = "Association Between Physical Attractiveness and Course Evalutation Score", x = "Physical Attractiveness", y = "Course Evaluation Score")
+```
+
+This scatter plot shows the correlation between physical attractiveness and course evaluation score. The correlation between the two is `r round(cor(profs$beauty, profs$eval),2)`, showing that the two are positive but not strongly correlated. This means that a professor does not have to be considered beautiful to be good, however interesting to note that professors above a 1 beauty rating do not have lower than a 3.0 score and the highest rated professors has above a 1.5 beauty rating, showing that beautiful professors may have a tendency to be higher rated. 
+
+## Problem 2: bike sharing
+
+```{r echo = FALSE, fig.width = 10}
+bikeshare = read.csv("bikeshare.csv")
+```
+
+
+### Plot A.
+```{r echo = FALSE, fig.width = 10}
+bikeRentals = bikeshare %>% group_by(hr) %>% summarize(avg_rent = mean(total))
+
+ggplot(bikeRentals) + geom_line(aes(x = hr, y = avg_rent)) + geom_point(aes(x = hr, y = avg_rent), col = 'firebrick1') + theme_classic() + labs(title = "Average Hourly Bike Rentals across All Hours of the Day", x = "Hour of the Day", y = "Average Hourly Bike Rental")
+```
+This line graph shows the average hourly bike rentals across all hours of the day. The data shows that bike rentals spike twice during the day, at 8 AM, and 5 PM, with the lowest being at 4 AM. This shows that riders take more bikes at times that are generally busiest during work days. 
+
+### Plot B.
+
+```{r echo = FALSE, message = FALSE, fig.width = 10}
+bike_rent = bikeshare %>% group_by(hr, workingday) %>% summarise(avg_rent = mean(total))
+
+ggplot(bike_rent) + geom_path( aes(x = hr, y = avg_rent)) + facet_wrap(~workingday, labeller = as_labeller(c('0' = "Not Working Day", '1' = "Working Day"))) + geom_point(aes(x = hr, y = avg_rent), col = 'darkorange1') + theme_classic() + labs(title = "Average Bike Rentals by Hour of the Day by Working Day Status", x = "Hour of the Day", y = "Average Bike Rental")
+```
+These line graphs show the average bike rentals by hour of the day split by whether the day is a working day or not (weekend or holiday). The data shows that working days report higher usages of bikes than on non working days, as well as the peak time for bike rentals is at 8 AM, and 5 PM for working days, and 1 PM for non working days. This shows that ridership is most likely used to go to and from work, and is less common between those times, except for on weekends and holidays where ridership is most likely used for afternoon rides. 
+
+### Plot C.
+```{r echo = FALSE, fig.width = 10}
+ggplot(filter(bikeshare, hr == 9)) + geom_bar(stat= "summary" , fun = "mean", aes(x = weathersit, y = total), col = 'black', fill = 'gold') + facet_wrap(~workingday, labeller = as_labeller(c('0' = "Not Working Day", '1' = "Working Day"))) + theme_classic() + labs(title = "Average Ridership at 9AM by Weather Situation Code by Working Day Status", x = "Weather Situation Code", y = "Average Ridership")
+``` 
+This graph shows the average ridership at 9 AM by the weather situation split by whether or not the day is a working day or not. The data shows that a majority of riders will ride in clear or misty conditions or overall light conditions, especially during working days where there is almost no significant drop off from the two, whereas non working days, there are less riders during misty conditions. The data also shows that working day riders also report a large number of riders during light snow/rainy conditions, with no riders in either working or non working that appear during heavy conditions. This shows that riders on working days will not stop for most conditions, with a drop off during light rain/snow, and no riders during heavy conditions. 
+
+## Problem 3 - Capital Metro UT Ridership
+
+```{r echo = FALSE}
+utcapmetro = read.csv("capmetro_UT.csv")
+utcapmetro = mutate(utcapmetro, day_of_week = factor(day_of_week, levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")), month = factor(month, levels = c("Sep", "Oct", "Nov")))
+```
+
+### Plot 1. 
+```{r echo = FALSE, fig.height = 10, fig.width = 10}
+ggplot(utcapmetro) + geom_line(stat = "summary", fun = "mean", aes(x = hour_of_day, y = boarding, col = month)) + facet_wrap(~day_of_week) + labs(title = "Average Boarding by Hour, Day, and Month", x = "Hour of Day", y = "Average Boarding")
+```
+These line graphs show the average boarding by hour of day split by month and day of the week. The highest days of ridership lay in Monday to Friday with a huge drop off on Saturday and Sunday, with all three months being relatively close in numbers, with the exception of September Mondays, and November Wednesdays and Fridays. The hour of peak boarding are broadly similar from Monday to Friday with almost no peak or an earlier peak on Sunday and Saturday. The average boarding on Mondays in September are lower probably due to the fact that September has a few days off during that month, and similarly the same for November Weds/Thurs/Fri due to Thanksgiving break. 
+
+### Plot 2.
+```{r echo = FALSE, fig.height = 10, fig.width = 10}
+ggplot(utcapmetro) + geom_point(aes(x = temperature, y = boarding, col = weekend)) + facet_wrap(~hour_of_day) + labs(title = "Number of Boardings by Temperature and Hour of Day", x = "Temperature (F)", y = "Boardings" )
+
+```
+This graph shows the number boarding by temperature and hour of day split between whether it is a weekday or not. The data shows that there is more boarding done in lower temperatures only earlier and late in the day, and a majority of boarding come mid day with higher temperatures. When hour of day and weekend status is constant there is not a significant effect on the number of UT students riding the bus as the correlation coefficient is `r cor(utcapmetro$temperature, utcapmetro$boarding)`, which shows that while positive is not a very strong correlation. 
+
+## Problem 4: Wrangling the Billboard Top 100
+```{r echo = FALSE}
+billboard = read.csv("billboard.csv")
+```
+
+### Part A.
+```{r echo = FALSE, message = FALSE}
+top_ten = billboard %>% group_by(performer, song) %>% summarize(count = n_distinct(weeks_on_chart)) %>% arrange(desc(count)) %>% head(10)
+top_ten = kable(top_ten, col.names = c("Performer", "Song", "Count")) 
+top_ten
+```
+This table shows the top 10 songs on the Billboard Top 100 Chart with the most weeks charted, and their respective artists. 
+
+### Part B. 
+```{r echo = FALSE, message = FALSE, fig.width = 10, fig.height = 8}
+musical_diversity = billboard %>% filter(year != 2021 & year != 1958) %>% group_by(year,song,performer) %>% summarise(num_song = n())
+musical_diversity = musical_diversity %>% group_by(year) %>% summarise(total_song = n())
+ggplot(musical_diversity) + geom_path(aes(x = year, y = total_song)) + labs(title = "Musical Diversity of Billboard Top 100 by Year", x = "Year", y = "Total Number of Songs")
+```
+
+This line graph shows the musical diversity of the Billboard Top 100 by year. The data shows that the most musical diversity was reported in 1966, and had been on a steady decline until around 2010 finally peaking back up again in 2020. This shows that music had a resurgence in 202 with the most unique songs at around 800 since 1966.
+
+### Part C.
+```{r echo = FALSE, message = FALSE, fig.width = 10, fig.height = 8}
+ten_week = billboard %>% group_by(performer, song) %>% summarise(num_week = n_distinct(weeks_on_chart)) %>% filter(num_week >= 10) %>% group_by(performer) %>% summarise(num_song = n_distinct(song)) %>% filter(num_song >= 30)
+
+ggplot(ten_week) + geom_col(aes(x = performer, y = num_song),fill = 'cadetblue1') + coord_flip() + theme_minimal() + labs(title = "Artists Who Have Over 30 Songs with 10+ Weeks ", x = "Number of Songs", y = "Artist")
+```
+
+This bar plot shows the 19 artists with over 30 songs that have over 10 weeks on the Billboard Top 100. The data shows that Elton John has the most with over 50, and then Madonna and Kenny Chesney respectively, with the lowest artists being Brad Paisley, Daryl Hall John Oates, George Strait, Jason Aldean and Neil Diamond all with 30 songs. 
