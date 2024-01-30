@@ -12,6 +12,9 @@ output:
 knitr::opts_chunk$set(fig.height=3, fig.width=4, warning=FALSE, tidy=TRUE, tidy.opts=list(width.cutoff=60))
 ```
 
+[https://github.com/TarunMano/SDS315_Homework_2](https://github.com/TarunMano/SDS315_Homework_2)
+
+
 ***
 ```{r, echo =  FALSE, message = FALSE}
 library(ggplot2)
